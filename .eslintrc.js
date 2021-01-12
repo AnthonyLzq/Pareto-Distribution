@@ -47,6 +47,7 @@ module.exports = {
     ],
     '@typescript-eslint/semi'          : ['error', 'never'],
     'arrow-parens'                     : ['error', 'as-needed'],
+    'comma-dangle'                     : ['error', 'never'],
     curly                              : ['error', 'multi'],
     'import/no-extraneous-dependencies': [
       'error', 
@@ -55,6 +56,7 @@ module.exports = {
       }
     ],
     'import/prefer-default-export': 'off',
+    'key-spacing'                 : [2, { align: 'colon' }],
     'lines-between-class-members' : [
       "error",
       "always",
@@ -74,15 +76,16 @@ module.exports = {
         ignoreUrls            : true
       }
     ],
-    'newline-before-return': 'error',
-    'no-extra-parens'      : 'error',
-    'no-console'           : 'off',
-    'no-param-reassign'    : 'off',
-    'no-plusplus'          : 'off',
-    'object-curly-spacing' : ['error', 'always'],
-    'prefer-const'         : 'error',
-    radix                  : ['error', 'as-needed'],
-    semi                   : [2, 'never'],
+    'newline-before-return'      : 'error',
+    'no-extra-parens'            : 'error',
+    'no-console'                 : 'off',
+    'no-param-reassign'          : 'off',
+    'no-plusplus'                : 'off',
+    'no-trailing-spaces'         : 'error',
+    'object-curly-spacing'       : ['error', 'always'],
+    'prefer-const'               : 'error',
+    radix                        : ['error', 'as-needed'],
+    semi                         : [2, 'never'],
     'space-before-function-paren': [
       'error',
       {
