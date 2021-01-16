@@ -1,5 +1,14 @@
 # Pareto distribution verification
 
+## Version 0.4.0
+
+- Updated:
+  - Dependencies
+- TODO:
+  - Once exchanges stop, each category will receive its corresponding salary, showed below<sup>[1](#salary)</sup> (pending to assign a date).
+  - Show the results in a graph (pending to assign a date).
+  - Update the [`documentation`](https://github.com/AnthonyLzq/Pareto-Distribution/blob/master/docs/readme.md) (pending to assign a date).
+
 ## Version 0.3.0
 
 - Implemented:
