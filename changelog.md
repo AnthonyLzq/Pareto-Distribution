@@ -1,5 +1,22 @@
 # Pareto distribution verification
 
+## Version 0.5.0
+
+- Implemented:
+  - Ids for each person.
+  - Changed the exchange formula, now we exchange random values depending on the status from both people, according to this:
+    - A person from status E will exchange an amount between 1 and 100.
+    - A person from status D will exchange an amount between 1 and 500.
+    - A person from status C will exchange an amount between 1 and 1000.
+    - A person from status B will exchange an amount between 1 and 5000.
+    - A person from status A will exchange an amount between 1 and 10000.
+
+    We will choose the minimal amount between those both random values, for example, if there is exchange between two people, one from E status and the other from the B status, then the amount of money will be limited by a random number between 1 a 100, since this is the limit for a person from E status.
+- TODO:
+  - Once exchanges stop, each category will receive its corresponding salary, showed below<sup>[1](#salary)</sup> (pending to assign a date).
+  - Show the results in a graph (pending to assign a date).
+  - Update the [`documentation`](https://github.com/AnthonyLzq/Pareto-Distribution/blob/master/docs/readme.md) (pending to assign a date).
+
 ## Version 0.4.0
 
 - Updated:

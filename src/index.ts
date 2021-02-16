@@ -11,12 +11,11 @@ import { appendFile, exists, writeFile } from './utils/writeFile'
 import { CliOptions } from './classes/cli-progress.options'
 import {
   baseMoneyFromStatus,
-  exchangeValue,
   limitPercentagesToExchange,
-  iterations,
   people,
   Person,
   peopleNumber,
+  rangeMoneyToExchangePerStatus,
   resultsPath
 } from './utils/pareto.constants'
 
@@ -27,69 +26,57 @@ const peopleFromStatus = {
   d: (parseInt(process.env.PERCENT_FROM_D as string) * peopleNumber) / 100,
   e: (parseInt(process.env.PERCENT_FROM_E as string) * peopleNumber) / 100
 }
-let peopleConstant: Array<Person>
-let peopleAllowed = peopleNumber
-
-const avoidRepetition = (numberToAvoid: number): number => {
-  let number = random.int(0, peopleAllowed - 1)
-  while (number === numberToAvoid) number = random.int(0, peopleAllowed - 1)
-
-  return number
-}
+const peoplePositions: number[] = []
 
 const cleaner = (chosen: number): void => {
-  const currentMoney = people[chosen].money
+  // const currentMoney = people[chosen].money
+  const { moneyExchanged } = people[chosen]
 
   // eslint-disable-next-line default-case
   switch (people[chosen].status) {
     case 'a':
       if (
-        currentMoney <=
-        limitPercentagesToExchange.a * baseMoneyFromStatus.a
+        // currentMoney <= limitPercentagesToExchange.a * baseMoneyFromStatus.a ||
+        moneyExchanged >= limitPercentagesToExchange.a * baseMoneyFromStatus.a
       ) {
-        peopleConstant[chosen].allowed = false
-        people.splice(chosen, 1)
-        peopleAllowed--
+        people[chosen].allowed = false
+        peoplePositions.splice(chosen, 1)
       }
       break
     case 'b':
       if (
-        currentMoney <=
-        limitPercentagesToExchange.b * baseMoneyFromStatus.b
+        // currentMoney <= limitPercentagesToExchange.b * baseMoneyFromStatus.b ||
+        moneyExchanged >= limitPercentagesToExchange.b * baseMoneyFromStatus.b
       ) {
-        peopleConstant[chosen].allowed = false
-        people.splice(chosen, 1)
-        peopleAllowed--
+        people[chosen].allowed = false
+        peoplePositions.splice(chosen, 1)
       }
       break
     case 'c':
       if (
-        currentMoney <=
-        limitPercentagesToExchange.c * baseMoneyFromStatus.c
+        // currentMoney <= limitPercentagesToExchange.c * baseMoneyFromStatus.c ||
+        moneyExchanged >= limitPercentagesToExchange.c * baseMoneyFromStatus.c
       ) {
-        peopleConstant[chosen].allowed = false
-        people.splice(chosen, 1)
-        peopleAllowed--
+        people[chosen].allowed = false
+        peoplePositions.splice(chosen, 1)
       }
       break
     case 'd':
       if (
-        currentMoney <=
-        limitPercentagesToExchange.d * baseMoneyFromStatus.d
+        // currentMoney <= limitPercentagesToExchange.d * baseMoneyFromStatus.d ||
+        moneyExchanged >= limitPercentagesToExchange.d * baseMoneyFromStatus.d
       ) {
-        peopleConstant[chosen].allowed = false
-        people.splice(chosen, 1)
-        peopleAllowed--
+        people[chosen].allowed = false
+        peoplePositions.splice(chosen, 1)
       }
       break
     case 'e':
       if (
-        currentMoney <=
-        limitPercentagesToExchange.e * baseMoneyFromStatus.e
+        // currentMoney <= limitPercentagesToExchange.e * baseMoneyFromStatus.e ||
+        moneyExchanged >= limitPercentagesToExchange.e * baseMoneyFromStatus.e
       ) {
-        peopleConstant[chosen].allowed = false
-        people.splice(chosen, 1)
-        peopleAllowed--
+        people[chosen].allowed = false
+        peoplePositions.splice(chosen, 1)
       }
       break
   }
@@ -98,25 +85,48 @@ const cleaner = (chosen: number): void => {
 const exchange = (chosenOne: number, chosenTwo: number): void => {
   const coin = random.boolean()
 
-  if (coin) {
-    people[chosenOne].money += exchangeValue
-    people[chosenTwo].money -= exchangeValue
-    cleaner(chosenTwo)
-  } else {
-    people[chosenOne].money -= exchangeValue
-    people[chosenTwo].money += exchangeValue
+  // Get random value to exchange
+  // It's going to be the maximal random value between two people from different status
+  const exchangeValue = Math.min(
+    random.int(
+      rangeMoneyToExchangePerStatus[people[chosenOne].status][0],
+      rangeMoneyToExchangePerStatus[people[chosenOne].status][1]
+    ),
+    random.int(
+      rangeMoneyToExchangePerStatus[people[chosenTwo].status][0],
+      rangeMoneyToExchangePerStatus[people[chosenTwo].status][1]
+    )
+  )
+
+  if (
+    people[chosenOne].money >= exchangeValue &&
+    people[chosenTwo].money >= exchangeValue
+  ) {
+    people[chosenOne].moneyExchanged += exchangeValue
+    people[chosenTwo].moneyExchanged += exchangeValue
+
+    if (coin) {
+      people[chosenOne].money += exchangeValue
+      people[chosenTwo].money -= exchangeValue
+    } else {
+      people[chosenOne].money -= exchangeValue
+      people[chosenTwo].money += exchangeValue
+    }
+
     cleaner(chosenOne)
+    cleaner(chosenTwo)
   }
 }
 
 const generateRandomPosition = (previousValue?: number): number => {
-  let value: number = random.int(0, peopleAllowed - 1)
+  let number = random.int(0, peoplePositions.length - 1)
 
-  if (!previousValue) return value
+  if (!previousValue) return number
 
-  while (previousValue === value) value = avoidRepetition(previousValue)
+  while (previousValue === number)
+    number = random.int(0, peoplePositions.length - 1)
 
-  return value
+  return number
 }
 
 const init = (): void => {
@@ -127,8 +137,9 @@ const init = (): void => {
   // D -> 4
   // E -> 5
   const statusCode = [1, 2, 3, 4, 5]
-  for (let i = 0; i < peopleAllowed; i++) {
+  for (let i = 0; i < peopleNumber; i++) {
     const status = statusCode[random.int(0, statusCode.length - 1)]
+    peoplePositions.push(i)
 
     // eslint-disable-next-line default-case
     switch (status) {
@@ -164,7 +175,6 @@ const init = (): void => {
         break
     }
   }
-  peopleConstant = people.slice()
 }
 
 const paretoSimulation = (): void => {
@@ -179,14 +189,19 @@ const runPareto = (options: CliOptions): void => {
     options,
     cliProgress.Presets.shades_classic
   )
-  bar.start(iterations, 0)
+  // bar.start(peoplePositions.length, 0)
 
-  for (let i = 0; i < iterations && people.length > 1; i++) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
     paretoSimulation()
-    bar.update(i + 1)
+    const nTrue = people.reduce<number>((trues, person) => (
+      person.allowed ? ++trues : trues
+    ), 0)
+
+    if (nTrue === 1) break
   }
 
-  bar.stop()
+  // bar.stop()
 }
 
 const main = async (): Promise<void> => {
@@ -194,7 +209,7 @@ const main = async (): Promise<void> => {
 
   if (!exists(resultsPath))
     try {
-      const result = await writeFile(people, resultsPath, null, true)
+      const result = await writeFile(people, resultsPath, true)
       console.log(result)
     } catch (error) {
       console.log('There was a problem trying to write the results')
@@ -205,7 +220,7 @@ const main = async (): Promise<void> => {
     `${colors.bold('Pareto Calculation Progress')} ${colors.cyan(
       '[{bar}]'
     )} ${colors.blue('{percentage}%')} | ${colors.bold(
-      'Current exchange:'
+      'Current people who stop exchanging:'
     )} ${colors.yellow('{value}')} | ${colors.bold('Duration:')} ${colors.green(
       '{duration_formatted}'
     )}`,
@@ -218,9 +233,8 @@ const main = async (): Promise<void> => {
   try {
     const result = await appendFile(
       people.length,
-      peopleConstant,
-      resultsPath,
-      iterations
+      people,
+      resultsPath
     )
     console.log(result)
   } catch (error) {

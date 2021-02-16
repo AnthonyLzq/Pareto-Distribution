@@ -3,7 +3,7 @@ const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   context: __dirname,
-  entry  : './src/pareto.ts',
+  entry  : './src/index.ts',
   externals: [nodeExternals()],
   module : {
     rules: [
@@ -20,7 +20,7 @@ module.exports = {
     extensions: ['.ts', '.js']
   },
   output: {
-    filename  : 'pareto.js',
+    filename  : 'index.js',
     path      : path.resolve(__dirname, 'dist'),
     publicPath: '/dist/'
   },

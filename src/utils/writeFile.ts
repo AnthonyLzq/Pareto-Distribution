@@ -12,7 +12,6 @@ const peopleFromStatus = {
 }
 
 const messageBuilder = (
-  iterations    : number | null,
   data          : Array<Person>,
   firstTime?    : boolean,
   allowedPeople?: number
@@ -21,7 +20,7 @@ const messageBuilder = (
     return `Initial data:\n\tStatus A:\n\t\tQuantity of people: ${peopleFromStatus.a}\n\t\tMoney per person: ${baseMoneyFromStatus.a}\n\tStatus B:\n\t\tQuantity of people: ${peopleFromStatus.b}\n\t\tMoney per person: ${baseMoneyFromStatus.b}\n\tStatus C:\n\t\tQuantity of people: ${peopleFromStatus.c}\n\t\tMoney per person: ${baseMoneyFromStatus.c}\n\tStatus D:\n\t\tQuantity of people: ${peopleFromStatus.d}\n\t\tMoney per person: ${baseMoneyFromStatus.d}\n\tStatus E:\n\t\tQuantity of people: ${peopleFromStatus.e}\n\t\tMoney per person: ${baseMoneyFromStatus.e}\n`
 
   const sortedData = quickSort(data)
-  let message = `Result after ${iterations} iterations:\n[\n`
+  let message = `Result after:\n[\n`
 
   sortedData.forEach(value => {
     message += `${value}`
@@ -32,40 +31,32 @@ const messageBuilder = (
   return message
 }
 
-const exists = (filename: string): boolean => {
-  return fs.existsSync(filename)
-}
+const exists = (filename: string): boolean => fs.existsSync(filename)
 
 const writeFile = (
   data      : Array<Person>,
   filename  : string,
-  iterations: number | null,
   firstTime?: boolean
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const message = messageBuilder(iterations, data, firstTime)
+): Promise<string> => new Promise((resolve, reject) => {
+    const message = messageBuilder(data, firstTime)
 
     fs.writeFile(filename, message, (error: unknown): void => {
       if (error) reject(error)
       resolve('Saved successfully')
     })
   })
-}
 
 const appendFile = (
   allowedPeople: number,
   data         : Array<Person>,
   filename     : string,
-  iterations   : number,
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const message = messageBuilder(iterations, data, false, allowedPeople)
+): Promise<string> => new Promise((resolve, reject) => {
+    const message = messageBuilder(data, false, allowedPeople)
 
     fs.appendFile(filename, message, (error: unknown): void => {
       if (error) reject(error)
       resolve('Saved successfully')
     })
   })
-}
 
 export { appendFile, exists, writeFile }
